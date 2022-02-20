@@ -1,0 +1,12 @@
+https://www.google.ie/search?rlz=1C1GGRV_enPL752PL752&biw=1700&bih=827&ei=-nwMW8e8MZKasAfDsb24Bg&q=grails+service&oq=grails+service&gs_l=psy-ab.3..0i20i263k1j0l9.172833.179093.0.179309.11.11.0.0.0.0.125.1037.6j5.11.0....0...1c.1.64.psy-ab..0.11.1037...35i39k1j0i67k1j0i131i67k1j0i22i30k1.0.Vb_14RFItPg
+
+https://www.jetbrains.com/help/idea/add-frameworks-support-dialog.html
+
+https://docs.grails.org/latest/guide/services.html
+
+http://grails.asia/grails-tutorial-for-beginners-grails-service-layer
+
+https://github.com/donalmcnamee/centaur
+
+https://www.youtube.com/results?search_query=Grails+IntelliJ+IDEA
+

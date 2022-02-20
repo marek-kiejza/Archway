@@ -1,0 +1,827 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CallMeMaybe</name>
+    </assembly>
+    <members>
+        <member name="T:CallMeMaybe.Maybe`1">
+            <summary>
+            Container for an optional value that may or may not exist.
+            </summary>
+            <remarks>
+            Using a <see cref="T:CallMeMaybe.Maybe`1"/> for optional values will help you to catch
+            problems at compile-time that may otherwise have created
+            <see cref="T:System.NullReferenceException"/>s at runtime.
+            </remarks>
+            <typeparam name="T">The type of value that this may or may not contain.</typeparam>
+        </member>
+        <member name="P:CallMeMaybe.Maybe`1.HasValue">
+            <summary>
+            Gets whether or not this <see cref="T:CallMeMaybe.Maybe`1"/> contains a value.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.#ctor(`0)">
+            <summary>
+            Constructs a <see cref="T:CallMeMaybe.Maybe`1"/> that contains the given value, or
+            an empty <see cref="T:CallMeMaybe.Maybe`1"/> if the value is null.
+            </summary>
+            <param name="value">
+            The value the <see cref="T:CallMeMaybe.Maybe`1"/> should contain. If null, the
+            <see cref="T:CallMeMaybe.Maybe`1"/> will not contain a value.
+            </param>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.CallMeMaybe#IMaybe#TryGetValue(System.Object@)">
+            <inheritdoc />
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.op_Implicit(`0)~CallMeMaybe.Maybe{`0}">
+            <summary>
+            Implicitly casts a value of type <typeparamref name="T"/> to a <see cref="T:CallMeMaybe.Maybe`1"/>
+            </summary>
+            <param name="value">
+            The value the <see cref="T:CallMeMaybe.Maybe`1"/> should contain. If null, the
+            <see cref="T:CallMeMaybe.Maybe`1"/> will not contain a value.
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> that contains the given value, or
+            an empty <see cref="T:CallMeMaybe.Maybe`1"/> if the value is null.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.op_Implicit(CallMeMaybe.MaybeNot)~CallMeMaybe.Maybe{`0}">
+            <summary>
+            Implicitly casts a <see cref="T:CallMeMaybe.MaybeNot"/> to a <see cref="T:CallMeMaybe.Maybe`1"/>
+            </summary>
+            <remarks>The existence of this operator allows consumers to use <see cref="F:CallMeMaybe.Maybe.Not"/>
+            in many cases where they would otherwise have needed to explicitly (and needlessly) 
+            specify the type via <see cref="P:CallMeMaybe.Maybe`1.Not"/></remarks>
+            <param name="maybeNot">A <see cref="T:CallMeMaybe.MaybeNot"/> value.</param>
+            <returns>A <see cref="T:CallMeMaybe.Maybe`1"/> without a value.</returns>
+        </member>
+        <member name="P:CallMeMaybe.Maybe`1.Not">
+            <summary>
+            Gets a <see cref="T:CallMeMaybe.Maybe`1"/> without a value.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Select``1(System.Func{`0,``0})">
+            <summary>
+            Maps from the value of this <see cref="T:CallMeMaybe.Maybe`1"/> (if it has a value)
+            to some other value based on this one.
+            </summary>
+            <typeparam name="TValue">The type produced by the selector.</typeparam>
+            <param name="selector">
+            A function which, given a value, will produce another value.
+            This will only be invoked if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.</param>
+            <returns>
+            If this <see cref="T:CallMeMaybe.Maybe`1"/> has a value, another <see cref="T:CallMeMaybe.Maybe`1"/> with the
+            value produced by invoking the selector. If this <see cref="T:CallMeMaybe.Maybe`1"/> is empty, or
+            if the selector produces a null value, an empty <see cref="T:CallMeMaybe.Maybe`1"/> will be returned.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Where(System.Func{`0,System.Boolean})">
+            <summary>
+            Filters this <see cref="T:CallMeMaybe.Maybe`1"/> by the given criteria.
+            </summary>
+            <param name="criteria">A filtering function.
+            This will only be invoked if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> with the same value as this one if this
+            <see cref="T:CallMeMaybe.Maybe`1"/> has a value that matches the given criteria.
+            Otherwise, an empty <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown if the criteria function is null.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.SelectMany``1(System.Func{`0,CallMeMaybe.Maybe{``0}})">
+            <summary>
+            Selects another <see cref="T:CallMeMaybe.Maybe`1"/> based on this one. 
+            <remarks>This can be used to "unwrap" nested <see cref="T:CallMeMaybe.Maybe`1"/>s via
+            <code>m.SelectMany(i => i)</code></remarks>
+            </summary>
+            <param name="resultSelector">
+            A function to select a resulting <see cref="T:CallMeMaybe.Maybe`1"/>
+            based on the value in this one.
+            This will only be invoked if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.
+            </param>
+            <returns>
+            The result of the <paramref name="resultSelector"/> if this has a value.
+            Otherwise returns an empty <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.SelectMany``2(System.Func{`0,CallMeMaybe.Maybe{``0}},System.Func{`0,``0,``1})">
+            <summary>
+            Selects a projection from two <see cref="T:CallMeMaybe.Maybe`1"/>s.
+            <remarks>
+            This is typically invoked with LINQ's Query Expression Syntax, and can be
+            useful for safely producing a <see cref="T:CallMeMaybe.Maybe`1"/> from a chain of possible
+            values.
+            </remarks>
+            <example>
+            <code>
+            var q = from i in maybe1
+                    from s in i.GetSomeMaybe()
+                    select new {i, s};
+            </code>
+            </example>
+            </summary>
+            <typeparam name="TOther">The generic type for the second <see cref="T:CallMeMaybe.Maybe`1"/></typeparam>
+            <typeparam name="TResult">The type of the desired result. <see cref="T:CallMeMaybe.Maybe`1"/></typeparam>
+            <param name="otherSelector">A function to produce another <see cref="T:CallMeMaybe.Maybe`1"/>, given the
+            value in this one. This will only be invoked if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.</param>
+            <param name="resultSelector">A function to produce the desired result. This will only be
+            invoked if both <see cref="T:CallMeMaybe.Maybe`1"/>s have a value.</param>
+            <returns>A <see cref="T:CallMeMaybe.Maybe`1"/> containing the result if both this and the result of
+            <paramref name="otherSelector"/> have values. Otherwise, and empty <see cref="T:CallMeMaybe.Maybe`1"/>.</returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Single">
+            <summary>
+            Produces the value in this <see cref="T:CallMeMaybe.Maybe`1"/> if it has one.
+            Otherwise, an <see cref="T:System.InvalidOperationException"/> is thrown.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if called on an empty <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.ToList">
+            <summary>
+            Produces a <see cref="T:System.Collections.Generic.List`1"/> containing the value in this <see cref="T:CallMeMaybe.Maybe`1"/>
+            if it has one, or an empty <see cref="T:System.Collections.Generic.List`1"/> otherwise.
+            <remarks>
+            This is especially useful for making LINQ operations available.
+            <code>var values = maybe1.ToList().Concat(maybe2.ToList());</code>
+            </remarks>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Do(System.Action{`0})">
+            <summary>
+            Performs the given action if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.
+            Otherwise, this will do nothing at all.
+            </summary>
+            <param name="action">
+            The action to perform if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.
+            (The value will be given as the action's parameter).
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown if the <paramref name="action"/> parameter is null.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Else(System.Func{`0})">
+            <summary>
+            Gets the value of this <see cref="T:CallMeMaybe.Maybe`1"/>, or 
+            produces a fallback value if this <see cref="T:CallMeMaybe.Maybe`1"/> has no value,
+            by invoking the given function.
+            </summary>
+            <param name="getValueIfNot">
+            A function which will be invoked to produce a fallback value if this
+            <see cref="T:CallMeMaybe.Maybe`1"/> has no value.</param>
+            <returns>
+            Either the value contained by this <see cref="T:CallMeMaybe.Maybe`1"/> (if it has one), 
+            or the value produced by invoking <paramref name="getValueIfNot"/> otherwise.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown if the <paramref name="getValueIfNot"/> parameter is null.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Else(`0)">
+            <summary>
+            Gets the value of this <see cref="T:CallMeMaybe.Maybe`1"/>, or 
+            returns a given fallback value if this <see cref="T:CallMeMaybe.Maybe`1"/> has no value.
+            </summary>
+            <param name="valueIfNot">
+            The fallback value to return if this <see cref="T:CallMeMaybe.Maybe`1"/> has no value.</param>
+            <returns>
+            Either the value contained by this <see cref="T:CallMeMaybe.Maybe`1"/> (if it has one), 
+            or <paramref name="valueIfNot"/> otherwise.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.ToString">
+            <summary>
+            Gets a string representation of this <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </summary>
+            <returns>
+            An empty string ("") if this <see cref="T:CallMeMaybe.Maybe`1"/> has no value, or
+            the result of calling <see cref="M:System.Object.ToString"/> on the contained
+            value if there is one.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.System#IEquatable{CallMeMaybe#Maybe{T}}#Equals(CallMeMaybe.Maybe{`0})">
+            <summary>
+            Explicit implementation of the <see cref="M:System.IEquatable`1.Equals(`0)"/> method,
+            to compare this with other <see cref="T:CallMeMaybe.Maybe`1"/>s of the same type.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Equals(System.Object)">
+            <summary>
+            Checks whether another object represents the same <see cref="T:CallMeMaybe.Maybe`1"/>
+            value as this one.
+            <remarks>`.Equals(null)` will always return false, since <see cref="T:CallMeMaybe.Maybe`1"/>s
+            are not null. It's incorrect to check them against a null value. Use <see cref="P:CallMeMaybe.Maybe`1.HasValue"/>
+            instead.</remarks>
+            </summary>
+            <param name="obj">An object to compare with this.</param>
+            <returns>
+            True if the other object is a <see cref="T:CallMeMaybe.Maybe`1"/>, and has the
+            same value (or non-value status) as this one. False otherwise.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.GetHashCode">
+            <summary>
+            Implementation of <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.op_Equality(CallMeMaybe.Maybe{`0},CallMeMaybe.Maybe{`0})">
+            <summary>
+            Implementation of the equality operator when comparing two <see cref="T:CallMeMaybe.Maybe`1"/> objects
+            of the same type.
+            </summary>
+            <returns>
+            True if the objects have the same value or non-value status. False otherwise.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.op_Inequality(CallMeMaybe.Maybe{`0},CallMeMaybe.Maybe{`0})">
+            <summary>
+            Implementation of the equality operator when comparing two <see cref="T:CallMeMaybe.Maybe`1"/> objects
+            of the same type.
+            </summary>
+            <returns>
+            False if the objects have the same value or non-value status. True otherwise.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Is(System.Func{`0,System.Boolean})">
+            <summary>
+            Determines whether this <see cref="T:CallMeMaybe.Maybe`1"/>'s value meets the given
+            criteria.
+            </summary>
+            <param name="criteria">
+            The criteria to check this <see cref="T:CallMeMaybe.Maybe`1"/>'s value against.
+            This will only be invoked if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value.
+            </param>
+            <returns>
+            True if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value that matches the given criteria.
+            False otherwise.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown if the criteria function is null.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.Is(`0)">
+            <summary>
+            Determines whether this <see cref="T:CallMeMaybe.Maybe`1"/>'s value is equal to the
+            given value.
+            </summary>
+            <param name="value">
+            A value to compare this <see cref="T:CallMeMaybe.Maybe`1"/>'s value against.
+            </param>
+            <returns>
+            True if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value that matches the given criteria.
+            False otherwise.
+            </returns>
+            <remarks>
+            This method uses the <see cref="M:System.Object.Equals(System.Object)"/> method to determine
+            equality.
+            </remarks>
+        </member>
+        <member name="M:CallMeMaybe.Maybe`1.OfType``1">
+            <summary>
+            Creates a differently-typed <see cref="T:CallMeMaybe.Maybe`1"/> value, which will contain
+            this <see cref="T:CallMeMaybe.Maybe`1"/>'s value if it is of the given type.
+            <remarks>
+            This method will not invoke conversion operators (explicit or implicit),
+            so the result will only have a value if the given object is actually of the
+            given type.
+            </remarks>
+            </summary>
+            <typeparam name="TDest">The desired type to cast the <see cref="T:CallMeMaybe.Maybe`1"/> to.</typeparam>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> with this <see cref="T:CallMeMaybe.Maybe`1"/>'s value, if its
+            value is of the given type. If this <see cref="T:CallMeMaybe.Maybe`1"/> is empty, or if
+            its value is not of the given type, and empty <see cref="T:CallMeMaybe.Maybe`1"/> will
+            be returned.
+            </returns>
+        </member>
+        <member name="T:CallMeMaybe.IMaybe">
+            <summary>
+            A non-generic interface implemented by <see cref="T:CallMeMaybe.Maybe`1"/> values, to allow basic
+            operations against a non-generically-typed <see cref="T:CallMeMaybe.Maybe`1"/>.
+            <remarks>
+            This interface should only be implemented by <see cref="T:CallMeMaybe.Maybe`1"/> and <see cref="T:CallMeMaybe.MaybeNot"/>.
+            Implementing it with other types may cause <see cref="T:CallMeMaybe.Maybe`1"/> to behave unexpectedly in some cases.
+            </remarks>
+            </summary>
+        </member>
+        <member name="P:CallMeMaybe.IMaybe.HasValue">
+            <summary>
+            Gets whether or not this <see cref="T:CallMeMaybe.Maybe`1"/> contains a value.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.IMaybe.TryGetValue(System.Object@)">
+            <summary>
+            Attempts to get the value.
+            </summary>
+            <param name="value">
+            An out parameter that will be set to the value inside this <see cref="T:CallMeMaybe.Maybe`1"/>
+            if it has one, or the default value for type T if not.
+            </param>
+            <returns>True if this <see cref="T:CallMeMaybe.Maybe`1"/> has a value, false otherwise.</returns>
+        </member>
+        <member name="T:CallMeMaybe.Maybe">
+            <summary>
+            A non-generic helper class for producing <see cref="T:CallMeMaybe.Maybe`1"/> values declaratively.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.Maybe.From``1(``0)">
+            <summary>
+            Creates a <see cref="T:CallMeMaybe.Maybe`1"/> based on the given value.
+            </summary>
+            <typeparam name="T">
+            The type of value that this <see cref="T:CallMeMaybe.Maybe`1"/> may contain.
+            </typeparam>
+            <param name="value">
+            The value the <see cref="T:CallMeMaybe.Maybe`1"/> should contain. If null, the
+            <see cref="T:CallMeMaybe.Maybe`1"/> will not contain a value.
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> that contains the given value, or
+            an empty <see cref="T:CallMeMaybe.Maybe`1"/> if the value is null
+            </returns>
+            <remarks>This is the same as calling the Maybe constructor, but `Maybe.From(val)` often reads better in code.</remarks>
+        </member>
+        <member name="M:CallMeMaybe.Maybe.From``1(System.Nullable{``0})">
+            <summary>
+            Creates a <see cref="T:CallMeMaybe.Maybe`1"/> based on the given value.
+            </summary>
+            <typeparam name="T">
+            The type of value that this <see cref="T:CallMeMaybe.Maybe`1"/> may contain.
+            </typeparam>
+            <param name="value">
+            The value the <see cref="T:CallMeMaybe.Maybe`1"/> should contain. If null, the
+            <see cref="T:CallMeMaybe.Maybe`1"/> will not contain a value.
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> that contains the given value, or
+            an empty <see cref="T:CallMeMaybe.Maybe`1"/> if the value is null
+            </returns>
+            <remarks>This overload automatically converts nullables to <see cref="T:CallMeMaybe.Maybe`1"/>s.</remarks>
+        </member>
+        <member name="F:CallMeMaybe.Maybe.Not">
+            <summary>
+            A value that can be implicitly cast to a <see cref="T:CallMeMaybe.Maybe`1"/> with no value.
+            </summary>
+            <remarks>
+            If you're in a context where implicit casting doesn't make sense, try 
+            <see cref="P:CallMeMaybe.Maybe`1.Not"/> instead.
+            </remarks>
+        </member>
+        <member name="M:CallMeMaybe.Maybe.If``1(System.Boolean,``0)">
+            <summary>
+            Produces a <see cref="T:CallMeMaybe.Maybe`1"/> which contains the given value if the given
+            condition is met, or a <see cref="T:CallMeMaybe.Maybe`1"/> with no value otherwise.
+            </summary>
+            <typeparam name="T">
+            The type of value that the returned <see cref="T:CallMeMaybe.Maybe`1"/> may contain.
+            </typeparam>
+            <param name="condition">
+            A boolean representing whether the given value should be
+            put into the returned <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </param>
+            <param name="valueIfTrue">
+            The value the <see cref="T:CallMeMaybe.Maybe`1"/> should contain if the given condition is true. 
+            If null, the <see cref="T:CallMeMaybe.Maybe`1"/> will not contain a value.
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> with no value if the given condition is false, or if the
+            given value is null. Otherwise, a <see cref="T:CallMeMaybe.Maybe`1"/> containing the given value.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.Maybe.If``1(System.Boolean,System.Func{``0})">
+            <summary>
+            Produces a <see cref="T:CallMeMaybe.Maybe`1"/> which contains the value produced by invoking
+            the given function if the given condition is met, or a <see cref="T:CallMeMaybe.Maybe`1"/> with
+            no value otherwise.
+            </summary>
+            <typeparam name="T">
+            The type of value that the returned <see cref="T:CallMeMaybe.Maybe`1"/> may contain.
+            </typeparam>
+            <param name="condition">
+            A boolean representing whether the given function should be invoked to produce a 
+            value.
+            </param>
+            <param name="valueIfTrue">
+            A function that will be invoked to produce the value that the <see cref="T:CallMeMaybe.Maybe`1"/> 
+            should contain if the given condition is true. 
+            </param>
+            <returns>
+            A <see cref="T:CallMeMaybe.Maybe`1"/> with no value if the given condition is false, or if the
+            given function returns null. Otherwise, a <see cref="T:CallMeMaybe.Maybe`1"/> containing the given value.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown if <paramref name="valueIfTrue"/> is null.
+            </exception>
+        </member>
+        <member name="T:CallMeMaybe.MaybeExtensions">
+            <summary>
+            This class contains extension methods for helping <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> interact with
+            other types.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.GetMaybe``2(System.Collections.Generic.IDictionary{``0,``1},``0)">
+            <summary>
+            Produces a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> value that will contain the value corresponding 
+            to the given <paramref name="key"/> in the dictionary if one exists, or which will be
+            empty otherwise.
+            </summary>
+            <typeparam name="TKey">The type of the source dictionary's key.</typeparam>
+            <typeparam name="TValue">The type of the source dictionary's value.</typeparam>
+            <param name="dictionary">The dictionary to look in.</param>
+            <param name="key">The key to search for.</param>
+            <returns>
+            A <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> that is empty if the given <paramref name="dictionary"/> 
+            does not contain the given <paramref name="key"/></returns>, or if the value
+            with that <paramref name="key"/> is null. Otherwise, the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> will
+            contain the value with that <paramref name="key"/>.
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SelectMany``3(System.Collections.Generic.IEnumerable{``0},System.Func{``0,CallMeMaybe.Maybe{``1}},System.Func{``0,``1,``2})">
+            <summary>
+            A LINQ-like flattening method to only select items from non-empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s.
+            It's easiest to use LINQ Query Expression syntax for this.
+            </summary>
+            <example><code>
+            var luckyNumbers =
+                 from n in Enumerable.Range(1, 20)
+                 from s in HowLuckyIs(n)
+                 where s.Contains("lucky")
+                 select new {number = n, howLucky = s};
+            </code></example>
+            <typeparam name="TSource">The type of item in the original source.</typeparam>
+            <typeparam name="TCollection">The type of item in the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> that you're selecting.</typeparam>
+            <typeparam name="TResult">The type of item to select from the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/></typeparam>
+            <param name="source">The source collection.</param>
+            <param name="collectionSelector">A function yielding a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/></param>
+            <param name="resultSelector">A function which, given a value from the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>,
+            will yield the desired result.</param>
+            <returns>
+            A result from the <paramref name="resultSelector"/> for every item in the source
+            that yields a non-empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> when invoking the <paramref name="collectionSelector"/>.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SelectMany``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,CallMeMaybe.Maybe{``1}})">
+            <summary>
+            A LINQ-like flattening method to only select items from non-empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s.
+            </summary>
+            <example><code>
+            var luckyTexts =
+                Enumerable.Range(1, 20)
+                    .SelectMany(HowLuckyIs)
+                    .ToList();
+            
+            </code></example>
+            <typeparam name="TSource">The type of item in the original source.</typeparam>
+            <typeparam name="TResult">The type of item in the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> that you're selecting.</typeparam>
+            <param name="source">The source collection.</param>
+            <param name="resultSelector">A function yielding a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/></param>
+            <returns>
+            A result for every item in the source that yields a non-empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>
+            when passed into the <paramref name="resultSelector"/>.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SelectMany``2(CallMeMaybe.Maybe{``0},System.Func{``0,System.Collections.Generic.IEnumerable{``1}})">
+            <summary>
+            A LINQ-like flattening method to select items from a given collection or not,
+            depending on whether the <paramref name="source"/> has any values in it.
+            </summary>
+            <typeparam name="TSource">The type of item in the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/></typeparam>
+            <typeparam name="TResult">The type of item you wish to select out.</typeparam>
+            <param name="source">A <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> value.</param>
+            <param name="resultSelector">A function which, given a <typeparamref name="TSource"/>,
+            will produce an <see cref="T:System.Collections.Generic.IEnumerable`1"/> of <typeparamref name="TResult"/>s.</param>
+            <returns>
+            The collection of items produced by the <paramref name="resultSelector"/> function, if
+            <paramref name="source"/> has a value. Otherwise, an empty collection.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.Values``1(System.Collections.Generic.IEnumerable{CallMeMaybe.Maybe{``0}})">
+            <summary>
+            Finds the given <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s that have values, and selects those values.
+            </summary>
+            <typeparam name="T">The type of object held by the given <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s.</typeparam>
+            <param name="source">A series of <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> values.</param>
+            <returns>
+            Returns the underlying values of any of the given <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s
+            that have values.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Linq.IQueryable{``0})">
+            <summary>
+            Finds the first element in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            </summary>
+            <remarks>
+            There is no "LastMaybe()" method, because we cannot ensure the degree of performance that
+            calls to methods like <see cref="M:System.Linq.Queryable.First``1(System.Linq.IQueryable{``0})"/>
+            or <see cref="M:System.Linq.Queryable.Last``1(System.Linq.IQueryable{``0})"/> would have.
+            As a workaround, you may change the ordering of the <see cref="T:System.Linq.IQueryable`1"/>, and
+            then call <see cref="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Linq.IQueryable{``0})"/>.
+            </remarks>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Linq.IQueryable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the first element in the source.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Finds the first element in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            </summary>
+            <remarks>
+            There is no "LastMaybe()" method, because we cannot provide a good Queryable-based LastMaybe() method,
+            and we don't want people accidentally enumerating an entire <see cref="T:System.Linq.IQueryable`1"/> because they
+            are accidentally calling an Enumerable-based method. 
+            As a workaround, you can call <code>source.Reverse().FirstMaybe()</code>, but you should be aware that
+            this could be expensive, depending on the nature of the underlying <see cref="T:System.Collections.Generic.IEnumerable`1"/>
+            </remarks>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the first element in the source.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Linq.IQueryable{System.Nullable{``0}})">
+            <summary>
+            Finds the first element in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            </summary>
+            <remarks>
+            There is no "LastMaybe()" method, because we cannot ensure the degree of performance that
+            calls to methods like <see cref="M:System.Linq.Queryable.First``1(System.Linq.IQueryable{``0})"/>
+            or <see cref="M:System.Linq.Queryable.Last``1(System.Linq.IQueryable{``0})"/> would have.
+            As a workaround, you may change the ordering of the <see cref="T:System.Linq.IQueryable`1"/>, and
+            then call <see cref="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Linq.IQueryable{``0})"/>.
+            </remarks>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Linq.IQueryable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the first element in the source.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.FirstMaybe``1(System.Collections.Generic.IEnumerable{System.Nullable{``0}})">
+            <summary>
+            Finds the first element in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            </summary>
+            <remarks>
+            There is no "LastMaybe()" method, because we cannot provide a good Queryable-based LastMaybe() method,
+            and we don't want people accidentally enumerating an entire <see cref="T:System.Linq.IQueryable`1"/> because they
+            are accidentally calling an Enumerable-based method. 
+            As a workaround, you can call <code>source.Reverse().FirstMaybe()</code>, but you should be aware that
+            this could be expensive, depending on the nature of the underlying <see cref="T:System.Collections.Generic.IEnumerable`1"/>
+            </remarks>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the first element in the source.
+            </returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SingleMaybe``1(System.Linq.IQueryable{``0})">
+            <summary>
+            Finds the only element in this sequence, and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            If there is more than one element in the sequence, an <see cref="T:System.InvalidOperationException"/>
+            will be thrown.
+            </summary>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the only element in the source.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the <paramref name="source"/> contains more than one element.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SingleMaybe``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Attempts to find the only element in the given sequence.
+            </summary>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the only element in the source.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the <paramref name="source"/> contains more than one element.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SingleMaybe``1(System.Linq.IQueryable{System.Nullable{``0}})">
+            <summary>
+            Finds the only element in this sequence, and returns it as a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.
+            If there is more than one element in the sequence, an <see cref="T:System.InvalidOperationException"/>
+            will be thrown.
+            </summary>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Linq.IQueryable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the only element in the source.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the <paramref name="source"/> contains more than one element.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.SingleMaybe``1(System.Collections.Generic.IEnumerable{System.Nullable{``0}})">
+            <summary>
+            Attempts to find the only element in the given sequence.
+            </summary>
+            <typeparam name="T">The type of object held by the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</typeparam>
+            <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> to look for an element in.</param>
+            <returns>
+            An empty <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> if there are no elements in the given <see cref="T:System.Collections.Generic.IEnumerable`1"/>,
+            or if the first element is a null value.
+            Otherwise, returns the only element in the source.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the <paramref name="source"/> contains more than one element.
+            </exception>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})">
+            <summary>
+            Converts the given nullable value into a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>
+            </summary>
+            <typeparam name="T">The type of object the <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> will hold.</typeparam>
+            <param name="nullable">A nullable object to convert to a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/></param>
+            <returns>A <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> that is empty if <paramref name="nullable"/> does not have a value,
+            or which contains the value if it does.</returns>
+            <remarks>This is useful because nullables cannot be implicitly cast to <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>s,
+            so we need an easy shortcut for passing a <see cref="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})"/> into a method that
+            takes a <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/>.</remarks>
+        </member>
+        <member name="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})">
+            <summary>
+            Converts the given <see cref="M:CallMeMaybe.MaybeExtensions.Maybe``1(System.Nullable{``0})"/> value into a <see cref="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})"/>.
+            </summary>
+            <typeparam name="T">The type of object the <see cref="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})"/> will hold.</typeparam>
+            <param name="maybe">A nullable object to convert to a <see cref="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})"/></param>
+            <returns>A <see cref="M:CallMeMaybe.MaybeExtensions.Nullable``1(CallMeMaybe.Maybe{``0})"/> that is "null" if <paramref name="maybe"/> does not have a value,
+            or which contains the value if it does.</returns>
+        </member>
+        <member name="T:CallMeMaybe.MaybeNot">
+            <summary>
+            An object that can be implicitly cast to a <see cref="T:CallMeMaybe.Maybe`1"/> with no value.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.MaybeNot.ToString">
+            <summary>
+            Gets a string representation of this <see cref="T:CallMeMaybe.Maybe`1"/>.
+            </summary>
+            <returns>An empty string.</returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeNot.Equals(System.Object)">
+            <summary>
+            An <see cref="M:CallMeMaybe.MaybeNot.Equals(System.Object)"/> override, which will only return <value>true</value> if
+            the object is another <see cref="T:CallMeMaybe.MaybeNot"/>.
+            </summary>
+            <remarks>
+            Each separate type of Maybe counts as its own value.
+            All <see cref="T:CallMeMaybe.MaybeNot"/>s are the same, but different <see cref="P:CallMeMaybe.Maybe`1.Not"/>s
+            are their own values.
+            This is just to maintain consistent behavior--users are not expected to put different types of Maybe objects
+            in hashsets and such.
+            </remarks>
+            <param name="obj">The object to compare this one with.</param>
+            <returns><value>true</value> if the given value is a <see cref="T:CallMeMaybe.MaybeNot"/>, <value>false</value> otherwise.</returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeNot.GetHashCode">
+            <summary>
+            A <see cref="M:CallMeMaybe.MaybeNot.GetHashCode"/> override.
+            </summary>
+            <returns>A hashcode which is guaranteed to be the same for all <see cref="T:CallMeMaybe.MaybeNot"/>s.</returns>
+        </member>
+        <member name="P:CallMeMaybe.MaybeNot.CallMeMaybe#IMaybe#HasValue">
+            <summary>
+            Gets whether or not this <see cref="T:CallMeMaybe.Maybe`1"/> contains a value.
+            </summary>
+            <remarks>For <see cref="T:CallMeMaybe.MaybeNot"/> this is always false.</remarks>
+        </member>
+        <member name="M:CallMeMaybe.MaybeNot.CallMeMaybe#IMaybe#TryGetValue(System.Object@)">
+            <summary>
+            Attempts to get the value.
+            </summary>
+            <remarks>
+            For <see cref="T:CallMeMaybe.MaybeNot"/>, this will always return false, 
+            and produce a null output value.
+            </remarks>
+            <param name="value">
+            In the case of <see cref="T:CallMeMaybe.MaybeNot"/>, this will always yield null.
+            </param>
+            <returns>False, because this is a <see cref="T:CallMeMaybe.MaybeNot"/></returns>
+        </member>
+        <member name="T:CallMeMaybe.MaybeParseExtensions">
+            <summary>
+            A class that contains extension methods with parsing helpers for <see cref="T:CallMeMaybe.Maybe`1"/>s.
+            </summary>
+        </member>
+        <member name="M:CallMeMaybe.MaybeParseExtensions.ParseInt32(CallMeMaybe.Maybe{System.String})">
+            <summary>
+            Attempts to parse the given string into an <see cref="T:System.Int32"/>,
+            using the standard <see cref="M:System.Int32.TryParse(System.String,System.Int32@)"/> overload.
+            </summary>
+            <param name="s">The string to parse.</param>
+            <returns>The parsed integer if parsing was successful,
+            or an empty <see cref="T:CallMeMaybe.Maybe`1"/> if this <see cref="T:CallMeMaybe.Maybe`1"/>
+            if empty, or if the parse fails.</returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeParseExtensions.ParseInt64(CallMeMaybe.Maybe{System.String})">
+            <summary>
+            Attempts to parse the given string into an <see cref="T:System.Int64"/>,
+            using the standard <see cref="M:System.Int64.TryParse(System.String,System.Int64@)"/> overload.
+            </summary>
+            <param name="s">The string to parse.</param>
+            <returns>The parsed integer if parsing was successful,
+            or an empty <see cref="T:CallMeMaybe.Maybe`1"/> if this <see cref="T:CallMeMaybe.Maybe`1"/>
+            if empty, or if the parse fails.</returns>
+        </member>
+        <member name="M:CallMeMaybe.MaybeParseExtensions.ParseBoolean(CallMeMaybe.Maybe{System.String})">
+            <summary>
+            Attempts to parse the given string into a <see cref="T:System.Boolean"/>,
+            using the standard <see cref="M:System.Boolean.TryParse(System.String,System.Boolean@)"/> overload.
+            </summary>
+            <param name="s">The string to parse.</param>
+            <returns>The parsed integer if parsing was successful,
+            or an empty <see cref="T:CallMeMaybe.Maybe`1"/> if this <see cref="T:CallMeMaybe.Maybe`1"/>
+            if empty, or if the parse fails.</returns>
+        </member>
+        <member name="T:CallMeMaybe.IMaybeParser`1">
+            <summary>
+            An interface for an object that can parse strings into a specific value type,
+            returning a <see cref="T:CallMeMaybe.Maybe`1"/> of that type if successful, or an empty
+            <see cref="T:CallMeMaybe.Maybe`1"/> if not.
+            </summary>
+            <typeparam name="T">The type of object that this parser is capable of parsing.</typeparam>
+        </member>
+        <member name="M:CallMeMaybe.IMaybeParser`1.Parse(System.String)">
+            <summary>
+            Attempts to parse the given string.
+            </summary>
+            <param name="source"></param>
+            <returns>
+            An empty <see cref="T:CallMeMaybe.Maybe`1"/> if parsing fails, or one containing the parsed value
+            if parsing succeeds.
+            </returns>
+        </member>
+        <member name="T:CallMeMaybe.MaybeTryParseWrapper`1">
+            <summary>
+            Converts strings into <see cref="T:CallMeMaybe.Maybe`1"/>s.
+            This is useful when you have access to a TryParse-style method,
+            and prefer to use <see cref="T:CallMeMaybe.Maybe`1"/> patterns instead.
+            <example><code>
+            public void IsLucky(string str)
+            {
+              var intParser = MaybeTryParseWrapper&lt;int&gt;.FromTryParse(int.TryParse);
+              return intParser.Parse(input).Where(i => i == 13);
+            }
+            </code></example>
+            </summary>
+            <remarks>This is an internal implementation of the public <see cref="T:CallMeMaybe.IMaybeParser`1"/>
+            interface, and therefore it cannot be used directly. Use the static methods on 
+            <see cref="T:CallMeMaybe.MaybeTryParseWrapper`1"/> to get one of these.</remarks>
+            <typeparam name="T">
+            The Type of value you want to have in the resulting <see cref="T:CallMeMaybe.Maybe`1"/>s.
+            </typeparam>
+        </member>
+        <member name="M:CallMeMaybe.MaybeTryParseWrapper`1.Parse(System.String)">
+            <summary>
+            Attempts to parse the given string.
+            </summary>
+            <param name="source"></param>
+            <returns>
+            An empty <see cref="T:CallMeMaybe.Maybe`1"/> if parsing fails, or one containing the parsed value
+            if parsing succeeds.
+            </returns>
+        </member>
+        <member name="T:CallMeMaybe.Delegates`1">
+            <summary>
+            This is just a place for us to keep generically-typed delegates.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:CallMeMaybe.Delegates`1.TryParse">
+            <summary>
+            A typical TryParse-patterned method, which takes in a source string,
+            and returns a boolean to represent whether parsing succeeded.
+            </summary>
+        </member>
+    </members>
+</doc>
